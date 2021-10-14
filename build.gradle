@@ -25,7 +25,7 @@ run {
     standardInput = System.in
 }
 
-task startShellMain(type: JavaExec){
+task shelldemo(type: JavaExec){
     standardInput = System.in
     classpath = sourceSets.main.runtimeClasspath;
     mainClass.set("nqgy2.sep.socketpingpong.ShellMain")
