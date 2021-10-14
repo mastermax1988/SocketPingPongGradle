@@ -1,4 +1,4 @@
-# Gradle + JavaFX project template
+# SocketPingPong 
 
 ## 1. Running the project:
 
