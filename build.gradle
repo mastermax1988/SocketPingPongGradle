@@ -1,0 +1,83 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+import java.nio.charset.StandardCharsets
+
+plugins {
+    id 'java'
+    id 'application'
+    // use for javafx support
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+def mainClassName = "nqgy2.sep.socketpingpong.OldMain"
+
+application {
+    mainClass.set(mainClassName)
+}
+
+group 'nqgy2.sep'
+version '1.0-SNAPSHOT'
+
+run {
+    standardInput = System.in
+}
+
+task startShellMain(type: JavaExec){
+    standardInput = System.in
+    classpath = sourceSets.main.runtimeClasspath;
+    mainClass.set("nqgy2.sep.socketpingpong.ShellMain")
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    //implementation files('libs/some_local_library_jar_file.jar')
+}
+
+// Use for JavaFX project:
+javafx {
+    version = '17'
+    modules = ['javafx.controls', 'javafx.fxml']
+}
+
+test {
+    useJUnitPlatform()
+}
+
+task javaFxJar(type: Jar) {
+    dependsOn compileJava
+    //destinationDirectory = file("${rootDir}/releases")
+    OperatingSystem operatingSystem = DefaultNativePlatform.currentOperatingSystem;
+    if (operatingSystem.isWindows()) {
+        archiveBaseName = "example-win"
+    } else if (operatingSystem.isMacOsX()) {
+        archiveBaseName = "example-osx"
+    } else if (operatingSystem.isLinux()) {
+        archiveBaseName = "example-linux"
+    } else {
+        archiveBaseName = "example"
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    from(sourceSets.main.output) {
+        include "**"
+        //exclude "**/TestServerClients.class"
+        //exclude "**/client/Client.class"
+        //exclude "**/view/*"
+    }
+
+    manifest {
+        // a non-javafx main class is needed for jars
+        attributes 'Main-Class': mainClassName
+    }
+}
