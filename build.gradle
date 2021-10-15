@@ -12,7 +12,7 @@ plugins {
 sourceCompatibility = 11
 targetCompatibility = 11
 
-def mainClassName = "nqgy2.sep.socketpingpong.OldMain"
+def mainClassName = "nqgy2.sep.socketpingpong.ShellMain"
 
 application {
     mainClass.set(mainClassName)
@@ -25,11 +25,18 @@ run {
     standardInput = System.in
 }
 
-task shelldemo(type: JavaExec){
+task startClient(type: JavaExec){
     standardInput = System.in
     classpath = sourceSets.main.runtimeClasspath;
     mainClass.set("nqgy2.sep.socketpingpong.ShellMain")
 }
+
+task startServer(type: JavaExec){
+    standardInput = System.in
+    classpath = sourceSets.main.runtimeClasspath;
+    mainClass.set("nqgy2.sep.socketpingpong.server.ServerMain")
+}
+
 repositories {
     mavenCentral()
 }
