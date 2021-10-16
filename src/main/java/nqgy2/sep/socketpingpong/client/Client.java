@@ -1,5 +1,7 @@
 package nqgy2.sep.socketpingpong.client;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -9,16 +11,18 @@ import nqgy2.sep.socketpingpong.messages.ClientMessage;
 import nqgy2.sep.socketpingpong.messages.RegistrationMessage;
 import nqgy2.sep.socketpingpong.messages.ServerMessage;
 
-
 public class Client {
 
+  public static final String NEW_MESSAGE_PROPERTY_NAME = "newMessage";
   private Socket socket;
   private ObjectInputStream reader;
   private ObjectOutputStream writer;
+  private PropertyChangeSupport propertyChangeSupport;
   private String name;
 
   public Client(String name) {
     this.name = name;
+    propertyChangeSupport = new PropertyChangeSupport(this);
     try {
       socket = new Socket();
       socket.connect(new InetSocketAddress("127.0.0.1", 8080));
@@ -75,8 +79,7 @@ public class Client {
         Object msgObj = reader.readObject();
         if (msgObj instanceof ServerMessage) {
           ServerMessage message = (ServerMessage) msgObj;
-          System.out.println(
-              "[CLIENT " + name + "] received from: " + message.from + ": " + message.content);
+          propertyChangeSupport.firePropertyChange(NEW_MESSAGE_PROPERTY_NAME, null, msgObj);
         } else {
           System.out.println("[CLIENT] received unknown message.");
         }
@@ -87,5 +90,13 @@ public class Client {
         e.printStackTrace();
       }
     }
+  }
+
+  public void addPropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+    propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+  }
+
+  public void removePropertyChangeListener(PropertyChangeListener propertyChangeListener) {
+    propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
   }
 }

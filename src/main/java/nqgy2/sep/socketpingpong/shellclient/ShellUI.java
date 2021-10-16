@@ -1,12 +1,15 @@
 package nqgy2.sep.socketpingpong.shellclient;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import nqgy2.sep.socketpingpong.client.Client;
+import nqgy2.sep.socketpingpong.messages.ServerMessage;
 
-public class ShellUI {
+public class ShellUI implements PropertyChangeListener {
 
   private String name;
   private BufferedReader shellIn;
@@ -21,6 +24,7 @@ public class ShellUI {
       e.printStackTrace();
     }
     client = new Client(name);
+    client.addPropertyChangeListener(this);
     Thread shellListenThread = new Thread(this::shellListener);
     shellListenThread.start();
   }
@@ -40,5 +44,16 @@ public class ShellUI {
         client.sendClientMessage(in);
       }
     }
+  }
+
+  @Override
+  public void propertyChange(PropertyChangeEvent evt) {
+    if (evt.getPropertyName() != Client.NEW_MESSAGE_PROPERTY_NAME) {
+      System.out.println("Uninteresting event received, ignored...");
+      return;
+    }
+    String messageContent = ((ServerMessage) evt.getNewValue()).content;
+    String from = ((ServerMessage) evt.getNewValue()).from;
+    System.out.println("[CLIENT " + name + "] received from: " + from + ": " + messageContent);
   }
 }
