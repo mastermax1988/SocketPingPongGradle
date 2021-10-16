@@ -1,5 +1,6 @@
 package nqgy2.sep.socketpingpong.client;
 
+import com.google.gson.Gson;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
@@ -30,7 +31,8 @@ public class Client {
       reader = new ObjectInputStream(socket.getInputStream());
       Thread t = new Thread(this::listen);
       t.start();
-      writer.writeObject(new RegistrationMessage(name));
+
+      writer.writeObject(new Gson().toJson(new RegistrationMessage(name)));
       System.out.println("[CLIENT " + name + "] connected");
     } catch (IOException e) {
       e.printStackTrace();
@@ -39,7 +41,7 @@ public class Client {
 
   public synchronized void sendClientMessage(String s) {
     try {
-      writer.writeObject(new ClientMessage(s));
+      writer.writeObject(new Gson().toJson(new ClientMessage(s)));
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -54,24 +56,7 @@ public class Client {
     }
   }
 
-  public void spam() {
-    new Thread(
-            () -> {
-              while (true) {
-                try {
-                  writer.writeObject(new ClientMessage("SPAM"));
-                } catch (IOException e) {
-                  return;
-                }
-                try {
-                  Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                  return;
-                }
-              }
-            })
-        .start();
-  }
+
 
   private void listen() {
     while (true) {

@@ -1,7 +1,11 @@
 package nqgy2.sep.socketpingpong.server;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectInputStream.GetField;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -67,18 +71,29 @@ public class Server {
   private void handleMessages(ServerConnection connection) {
     // dieser thread wartet auf ankommende nachrichten des verbundenen clients. bei mehreren clients
     // gibt es für jeden client genau einen thread, der auf nachrichten wartet.
+    Gson gson = new Gson();
     while (connection.getSocket().isConnected()) {
       try {
         Object msgObj = connection.getReader().readObject();
-        if (msgObj instanceof RegistrationMessage) {
-          connection.setUsername(((RegistrationMessage) msgObj).name);
-        } else if (msgObj instanceof ClientMessage) {
-          ClientMessage message = (ClientMessage) msgObj;
-          System.out.println("[SERVER] message received: " + message.content);
-          sendToAllClients(
-              new ServerMessage("Pong - " + message.content, connection.getUsername()));
-        } else {
-          System.out.println("[SERVER] Unknown message");
+        if(!(msgObj instanceof String)){
+          System.out.println("No string received");
+          return;
+        }
+        String jsonString = (String) msgObj;
+        String messageType = JsonParser.parseString(jsonString).getAsJsonObject().get("messageType").getAsString();
+        switch (messageType){
+          case Message.REGISTRATIONMESSAGE:
+            RegistrationMessage registrationMessage = gson.fromJson(jsonString, RegistrationMessage.class);
+            connection.setUsername(registrationMessage.name);
+            break;
+          case Message.CLIENTMESSAGE:
+            ClientMessage clientMessage = gson.fromJson(jsonString, ClientMessage.class);
+            System.out.println("[SERVER] message received: " + clientMessage.content);
+            sendToAllClients(
+                new ServerMessage("Pong - " + clientMessage.content, connection.getUsername()));
+            break;
+          default:
+            System.out.println("[SERVER] Unknown message");
         }
       } catch (IOException | ClassNotFoundException e) {
         System.out.println("[SERVER] connection lost " + connection.getUsername());

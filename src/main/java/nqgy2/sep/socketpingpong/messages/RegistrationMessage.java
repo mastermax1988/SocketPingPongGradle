@@ -9,6 +9,7 @@ public class RegistrationMessage extends Message {
   public String name;
 
   public RegistrationMessage(String name) {
+    super(Message.REGISTRATIONMESSAGE);
     this.name = name;
   }
 }

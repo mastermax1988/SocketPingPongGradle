@@ -22,6 +22,5 @@ public class OldMain {
     client1.sendClientMessage("Wo bist du c2?");
 
     Thread.sleep(1000);
-    client1.spam();
   }
 }
