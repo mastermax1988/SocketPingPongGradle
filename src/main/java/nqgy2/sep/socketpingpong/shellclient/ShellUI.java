@@ -6,14 +6,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import nqgy2.sep.socketpingpong.client.Client;
+import nqgy2.sep.socketpingpong.client.NetworkClient;
 import nqgy2.sep.socketpingpong.messages.ServerMessage;
 
 public class ShellUI implements PropertyChangeListener {
 
   private String name;
   private BufferedReader shellIn;
-  private Client client;
+  private NetworkClient client;
 
   public ShellUI() {
     shellIn = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
@@ -23,7 +23,7 @@ public class ShellUI implements PropertyChangeListener {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    client = new Client(name);
+    client = new NetworkClient(name);
     client.addPropertyChangeListener(this);
     Thread shellListenThread = new Thread(this::shellListener);
     shellListenThread.start();
@@ -48,7 +48,7 @@ public class ShellUI implements PropertyChangeListener {
 
   @Override
   public void propertyChange(PropertyChangeEvent evt) {
-    if (evt.getPropertyName() != Client.NEW_MESSAGE_PROPERTY_NAME) {
+    if (evt.getPropertyName() != NetworkClient.NEW_MESSAGE_PROPERTY_NAME) {
       System.out.println("Uninteresting event received, ignored...");
       return;
     }

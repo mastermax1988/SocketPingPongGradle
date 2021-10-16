@@ -1,34 +1,33 @@
 package nqgy2.sep.socketpingpong.server;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
-import nqgy2.sep.socketpingpong.messages.Message;
 
 public class ServerConnection {
 
   private Socket socket;
-  private ObjectOutputStream writer;
-  private ObjectInputStream reader;
+  private DataOutputStream writer;
+  private DataInputStream reader;
   private String username;
 
   public ServerConnection(
-      Socket socket, ObjectOutputStream writer, ObjectInputStream reader) {
+      Socket socket, DataOutputStream writer, DataInputStream reader) {
     this.socket = socket;
     this.writer = writer;
     this.reader = reader;
   }
 
-  synchronized void send(Message message) {
+  synchronized void send(String message) {
     try {
-      writer.writeObject(message);
+      writer.writeUTF(message);
     } catch (IOException e) {
       e.printStackTrace();
     }
   }
 
-  public ObjectInputStream getReader() {
+  public DataInputStream getReader() {
     return reader;
   }
 
