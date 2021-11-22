@@ -83,7 +83,7 @@ public class Server {
             ClientMessage clientMessage = gson.fromJson(jsonString, ClientMessage.class);
             System.out.println("[SERVER] message received: " + clientMessage.content);
             sendToAllClients(
-                gson.toJson(new ServerMessage("Pong - " + clientMessage.content, connection.getUsername())));
+                gson.toJson(new ServerMessage("Pong - " + clientMessage.content, "From: " + connection.getUsername())));
             break;
           default:
             System.out.println("[SERVER] Unknown message");
@@ -98,6 +98,7 @@ public class Server {
 
   private void sendToAllClients(String msg) {
     for (ServerConnection c : connectedClients) {
+      System.out.println("debug - sent msg to " + c.getUsername());
       c.send(msg);
     }
   }
