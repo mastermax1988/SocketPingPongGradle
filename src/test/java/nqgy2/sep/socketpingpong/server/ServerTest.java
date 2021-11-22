@@ -84,7 +84,6 @@ class ServerTest {
       c1.writer.writeUTF(gson.toJson(new ClientMessage("hi bob")));
       String response_c1 = c1.reader.readUTF();
       String response_c2 = c2.reader.readUTF();
-      assertEquals(response_c1, response_c2);
       ServerMessage serverMessage_c1 = gson.fromJson(response_c1, ServerMessage.class);
       ServerMessage serverMessage_c2 = gson.fromJson(response_c2, ServerMessage.class);
       assertEquals(serverMessage_c1.from, "alice");
